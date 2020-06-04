@@ -1,6 +1,7 @@
 from TreeNode import *
 from FileIO import *
 from TreeBuilder import *
+from LoadingBar import LoadingBar
 
 DATA_FILE_EXTENSION = "zap"
 TREE_FILE_EXTENSION = "zaptree"
@@ -9,14 +10,17 @@ VALUE = 0
 FREQUENCY = 1
 DEAD_LEAF = 2
 
+import sys
+
 class TreeFileTranslator():
-    def __init__(self, filename, mode):
+    def __init__(self, filename, mode, isLoadingBar=False):
         '''
         WRITE - generate a compressed bytestream and write it
         READ - read from a compressed stream and decompress it
         '''
         self.filename:str = filename
         self.mode = mode
+        self.isLoadingBar = isLoadingBar
 
     def init(self):
         if self.mode == WRITE:
@@ -65,8 +69,18 @@ class TreeFileTranslator():
             fileWriter.writeByte(ord(char))
 
         bitstream = ""
+
+        if self.isLoadingBar:
+            max_value = len(fileReader._contents)
+            loading = LoadingBar()
+
         for byte in range(len(fileReader._contents)):
             bitstream += self.pathdict.get(fileReader.getNextByte())
+            
+            # Loading bar
+            if self.isLoadingBar:
+                precent = round((byte / max_value) * 100, 2)
+                loading.update(precent)
 
         rem = 8 - len(bitstream) % 8
 
@@ -74,6 +88,8 @@ class TreeFileTranslator():
         fileWriter.writeBits(bitstream)
 
         fileWriter.close()
+
+        print("\nData file compressed successfully")
 
     def makeTreeFile(self):
         assert self.mode == WRITE
@@ -84,7 +100,6 @@ class TreeFileTranslator():
         self.__makeTreeFileHelper(self.tree)
 
         del self.treeFileIO
-        print(treeheight)
 
     def __makeTreeFileHelper(self, node: TreeNode):
         '''
