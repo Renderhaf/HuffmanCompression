@@ -28,7 +28,7 @@ class FileIO():
         elif self.type == WRITE:
             return open(self.filename, WRITE)
 
-    def getNextByte(self):
+    def getNextByte(self)->int:
         assert self.type == READ
         b = self._contents[self.current_byte_position]
         self.current_byte_position += 1
@@ -42,7 +42,7 @@ class FileIO():
             byte_number = byte_number >> 1
         return nbyte
 
-    def getNextBit(self):
+    def getNextBit(self)->int:
         assert self.type == READ
         if len(self.current_bits) == 0:
             self.current_bits = self._extractBits(self.getNextByte())

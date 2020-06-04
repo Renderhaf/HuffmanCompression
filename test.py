@@ -1,13 +1,15 @@
-from TreeFileTranslator import *
-from TreeBuilder import *
+from Compressor import *
+from Decompressor import *
 
-def test():
-  treetranslator = TreeFileTranslator('testfile', WRITE)
-  treetranslator.init()
-  testingdict = {chr(k):v for (k,v) in treetranslator.pathdict.items()}
-  print(testingdict)
-  treetranslator.makeDataFile()
+filename = 'testfile.exe'
+def test_write():
+  compress(filename)
+  
+
+def test_read():
+  decompress(filename)
 
 
 if __name__ == "__main__":
-  test()
+  test_write()
+  test_read()
